@@ -1,9 +1,15 @@
 import Board from "./components/Board/Board";
+import Toggle from "./components/Toggle/Toggle";
 
 function App() {
   return (
     <div>
       <Board />
+      <div className="toggle-wrapper">
+        <Toggle mode={"corner"} />
+        <Toggle mode={"impossible"} />
+        <Toggle mode={"reversed"} />
+      </div>
     </div>
   );
 }

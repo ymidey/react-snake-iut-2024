@@ -3,10 +3,17 @@ import Snake from "../Snake/Snake";
 import gsap from "gsap";
 import s from "./Board.module.scss";
 import Food from "../Food/Food";
-import { generateRandomCoordinates } from "../../utils/utils";
+import {
+  defaultControls,
+  generateRandomCoordinates,
+  reversedControls,
+} from "../../utils/utils";
 import GameOver from "../GameOver/GameOver";
+import useStore from "../../utils/store";
 
 const Board = () => {
+  const { mode, removeMode } = useStore();
+  const [paused, setPaused] = useState(false);
   const [snakeData, setSnakeData] = useState([
     [0, 0],
     [10, 0],
@@ -27,7 +34,7 @@ const Board = () => {
 
     setGameOver(true);
 
-    console.log("game over");
+    // console.log("game over");
   };
 
   const isOutOfBorder = () => {
@@ -97,7 +104,7 @@ const Board = () => {
     const outOfBorder = isOutOfBorder();
     const snakeAteFood = hasEatenFood();
 
-    console.log(snakeCollapsed);
+    // console.log(snakeCollapsed);
 
     if (outOfBorder || snakeCollapsed) {
       gameIsOver();
@@ -109,7 +116,7 @@ const Board = () => {
         setScore(score + 10);
 
         if (speed > 0.05) {
-          console.log("speed =", speed);
+          // console.log("speed =", speed);
           setSpeed(speed - 0.02);
         }
       }
@@ -141,50 +148,23 @@ const Board = () => {
     if (canChangeDirection.current === false) return;
     canChangeDirection.current = false;
 
-    switch (e.keyCode) {
-      case 38:
-        // console.log("going up");
-        if (direction.current !== "DOWN") {
-          direction.current = "UP";
-        }
-        // Going up
-        break;
-      case 40:
-        if (direction.current !== "UP") {
-          direction.current = "DOWN";
-        }
-        // Going down
-        break;
-      case 37:
-        if (direction.current !== "RIGHT") {
-          direction.current = "LEFT";
-        }
-        // Going left
-        break;
-      case 39:
-        if (direction.current !== "LEFT") {
-          direction.current = "RIGHT";
-        }
-        // Going right
-        break;
-
-      default:
-        break;
-    }
+    mode.includes("reversed")
+      ? reversedControls(e, direction)
+      : defaultControls(e, direction);
   };
 
   const addFood = () => {
     // console.log("add food");
     // génération de coordonnées
-    const coordinates = generateRandomCoordinates();
-    console.log(coordinates);
+    const coordinates = generateRandomCoordinates(mode);
+    // console.log(coordinates);
     // mise à jour du state
     setFoodArray((oldFoodArray) => [...oldFoodArray, coordinates]);
   };
 
   const gameLoop = (time, deltaTime, frame) => {
     // console.log(time, deltaTime, frame);
-
+    console.log("game loop");
     timer.current += deltaTime * 0.001;
     foodTimer.current += deltaTime * 0.001;
 
@@ -193,8 +173,7 @@ const Board = () => {
       addFood();
     }
 
-    if (timer.current > speed) {
-      //   console.log("Move snake");
+    if (timer.current > (mode.includes("impossible") ? 0.02 : speed)) {
       timer.current = 0;
       moveSnake();
       canChangeDirection.current = true;
@@ -203,6 +182,10 @@ const Board = () => {
 
   const replay = () => {
     // replay game
+
+    removeMode("corner");
+    removeMode("impossible");
+    removeMode("reversed");
 
     //reset game over
     setGameOver(false);
@@ -237,8 +220,25 @@ const Board = () => {
     };
   }, [snakeData]);
 
+  // const pauseGame = () => {
+  //   console.log("pause game");
+  //   if (paused) {
+  //     gsap.ticker.add(gameLoop);
+  //     setPaused(false);
+  //   } else {
+  //     setPaused(true);
+  //     timer.current = 0;
+  //     foodTimer.current = 0;
+
+  //     gsap.ticker.remove(gameLoop);
+  //   }
+  // };
+
   return (
     <div className={s.board}>
+      {/* <div className={s.pause} onClick={() => pauseGame()}>
+        Pause
+      </div> */}
       <Snake data={snakeData} />
 
       <span className={s.score}>Score: {score}</span>
