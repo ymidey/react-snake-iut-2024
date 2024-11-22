@@ -4,6 +4,7 @@ import Toggle from "./components/Toggle/Toggle";
 function App() {
   return (
     <div>
+      <div className="flashbang"></div>
       <Board />
       <div className="toggle-wrapper">
         <Toggle mode={"corner"} />

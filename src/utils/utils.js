@@ -1,4 +1,47 @@
 import uniqid from "uniqid";
+import gsap from "gsap";
+import useStore from "./store";
+
+const flashbangAudio = new Audio("/audio/csgo-flashbang.mp3");
+
+let flashTween = null;
+
+// window.location.href = "https://google.com";
+
+export const flashUser = () => {
+  if (flashTween) flashTween.kill();
+
+  flashbangAudio.currentTime = 0;
+  flashbangAudio.play();
+  document.querySelector(".flashbang").style.opacity = "1";
+
+  flashTween = gsap.to(".flashbang", {
+    opacity: 0,
+    duration: 2,
+    delay: 0.25,
+  });
+};
+
+export const triggerMode = () => {
+  const modes = ["impossible", "corner", "reversed"];
+  const selectedMode = modes[Math.floor(Math.random() * modes.length)];
+
+  // déclenche le mode sélectionné aléatoirement
+  useStore.getState().addMode(selectedMode);
+
+  setTimeout(() => {
+    useStore.getState().removeMode(selectedMode);
+  }, 1000);
+};
+
+export const wizz = () => {
+  gsap.to("#board", {
+    duration: 0.05,
+    x: "+=30%",
+    yoyo: true,
+    repeat: 9,
+  });
+};
 
 export const reversedControls = (e, direction) => {
   switch (e.keyCode) {
