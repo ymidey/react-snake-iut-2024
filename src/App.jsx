@@ -24,7 +24,7 @@ function App() {
   };
 
   return (
-    <div className="app">
+    <div>
       <div {...getRootProps({ className: "dropzone" })}>
         <input {...getInputProps()} />
         {skin && <img src={skin} alt="" />}
