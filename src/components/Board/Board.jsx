@@ -39,13 +39,9 @@ const Board = () => {
     gsap.ticker.remove(gameLoop);
 
     setGameOver(true);
-
-    // console.log("game over");
   };
 
-  const isOutOfBorder = () => {
-    const head = snakeData[snakeData.length - 1];
-
+  const isOutOfBorder = (head) => {
     if (head[0] >= 500 || head[1] >= 500 || head[0] < 0 || head[1] < 0) {
       return true;
     } else {
@@ -105,8 +101,8 @@ const Board = () => {
     newSnakeData.push(head);
     newSnakeData.shift();
 
-    const snakeCollapsed = hasCollapsed();
-    const outOfBorder = isOutOfBorder();
+    const snakeCollapsed = hasCollapsed(head);
+    const outOfBorder = isOutOfBorder(head);
     const snakeAteFood = hasEatenItem({
       getter: foodArray,
       setter: setFoodArray,
@@ -145,9 +141,9 @@ const Board = () => {
     }
   };
 
-  const hasCollapsed = () => {
+  const hasCollapsed = (head) => {
     let snake = [...snakeData];
-    let head = snake[snake.length - 1];
+    // let head = snake[snake.length - 1];
 
     // retire la dernière case du tableau
     snake.pop();
