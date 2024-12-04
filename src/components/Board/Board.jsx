@@ -14,6 +14,8 @@ import {
 } from "../../utils/utils";
 import GameOver from "../GameOver/GameOver";
 import useStore from "../../utils/store";
+import Submit from "../Submit/Submit";
+import Scoreboard from "../Scoreboard/Scoreboard";
 
 const Board = () => {
   const { mode, removeMode } = useStore();
@@ -25,6 +27,8 @@ const Board = () => {
 
   const [trapArray, setTrapArray] = useState([]);
   const [foodArray, setFoodArray] = useState([]);
+
+  const [hasEnteredResults, setHasEnteredResults] = useState(false);
 
   const [gameOver, setGameOver] = useState(false);
   const [speed, setSpeed] = useState(0.2);
@@ -246,6 +250,7 @@ const Board = () => {
 
     //reset game over
     setGameOver(false);
+    setHasEnteredResults(false);
     setSpeed(0.2); // reset speed
     setScore(0); // reset score
 
@@ -295,11 +300,16 @@ const Board = () => {
   return (
     <>
       {gameOver && <GameOver replay={replay} />}
+      {gameOver && !hasEnteredResults && (
+        <Submit
+          score={score}
+          death={death}
+          setHasEnteredResults={setHasEnteredResults}
+        />
+      )}
+      {gameOver && <Scoreboard />}
 
       <div id="board" className={s.board}>
-        {/* <div className={s.pause} onClick={() => pauseGame()}>
-        Pause
-      </div> */}
         <Snake data={snakeData} />
 
         <span className={s.score}>Score: {score}</span>
