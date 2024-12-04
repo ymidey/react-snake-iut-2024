@@ -1,6 +1,11 @@
 import { create } from "zustand";
 
 const useStore = create((set) => ({
+  skin: null,
+  setSkin: (param) =>
+    set(() => ({
+      skin: param,
+    })),
   mode: [],
   addMode: (param) =>
     set((state) => ({
