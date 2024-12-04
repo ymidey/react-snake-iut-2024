@@ -193,7 +193,7 @@ const Board = () => {
     trapTimer.current += deltaTime * 0.001;
 
     // ici, gestion de l'apparition de la nourriture
-    if (foodTimer.current > 3 && foodArray.length < 3) {
+    if (foodTimer.current > 0.5 && foodArray.length < 20) {
       foodTimer.current = 0;
       addItem({
         getter: foodArray,
@@ -202,7 +202,7 @@ const Board = () => {
     }
 
     // ici, gestion des pièges
-    if (trapTimer.current > 0.5 && trapArray.length < 50) {
+    if (trapTimer.current > 3 && trapArray.length < 5) {
       trapTimer.current = 0;
       addItem({
         getter: trapArray,
