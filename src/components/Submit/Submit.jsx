@@ -10,7 +10,10 @@ const Submit = ({ score, death, setHasEnteredResults }) => {
   useEffect(() => {
     let results = localStorage.getItem("results");
     results = JSON.parse(results);
-    setResults(results);
+
+    if (results) {
+      setResults(results);
+    }
   }, []);
 
   const onSubmit = (e) => {
