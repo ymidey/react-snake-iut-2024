@@ -7,6 +7,14 @@ const flashbangAudio = new Audio("/audio/csgo-flashbang.mp3");
 let flashTween = null;
 
 // window.location.href = "https://google.com";
+export const netherPortal = () => {
+  const video = document.getElementById("nether-video");
+  video.style.display = "block";
+
+  setTimeout(() => {
+    video.style.display = "none";
+  }, 3000);
+};
 
 export const flashUser = () => {
   if (flashTween) flashTween.kill();

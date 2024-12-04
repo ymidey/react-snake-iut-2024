@@ -35,3 +35,32 @@ body {
     outline: none;
   }
 }
+
+.die-video,
+.nether-video {
+  position: fixed;
+  width: 100%;
+  height: 100vh;
+  top: 0;
+  left: 0;
+  z-index: 80;
+  object-fit: cover;
+  display: none;
+}
+
+.nether-video {
+  opacity: 0.9;
+  width: 105%;
+  height: 105vh;
+  left: -2.5%;
+  top: -2.5%;
+  transform: scale(1);
+  transform-origin: center;
+  animation: rotatePortal 1s infinite linear;
+}
+
+@keyframes rotatePortal {
+  100% {
+    transform: scale(1.5);
+  }
+}

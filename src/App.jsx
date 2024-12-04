@@ -25,6 +25,16 @@ function App() {
 
   return (
     <div>
+      <video src="/you-died.mp4" id="die-video" className="die-video"></video>
+      <video
+        src="/nether.mp4"
+        id="nether-video"
+        className="nether-video"
+        autoPlay
+        loop
+        muted
+      ></video>
+
       <div {...getRootProps({ className: "dropzone" })}>
         <input {...getInputProps()} />
         {skin && <img src={skin} alt="" />}

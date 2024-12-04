@@ -10,6 +10,7 @@ import {
   triggerMode,
   reversedControls,
   wizz,
+  netherPortal,
 } from "../../utils/utils";
 import GameOver from "../GameOver/GameOver";
 import useStore from "../../utils/store";
@@ -28,6 +29,7 @@ const Board = () => {
   const [gameOver, setGameOver] = useState(false);
   const [speed, setSpeed] = useState(0.2);
   const [score, setScore] = useState(0);
+  const [death, setDeath] = useState(0);
 
   const timer = useRef(0);
   const foodTimer = useRef(0);
@@ -37,6 +39,14 @@ const Board = () => {
 
   const gameIsOver = () => {
     gsap.ticker.remove(gameLoop);
+
+    setDeath(death + 1);
+
+    const video = document.getElementById("die-video");
+    video.style.display = "block";
+
+    video.currentTime = 0;
+    video.play();
 
     setGameOver(true);
   };
@@ -119,7 +129,7 @@ const Board = () => {
     } else {
       if (snakeAteTrap === true) {
         // trap execution logic
-        const effects = [flashUser, triggerMode, wizz];
+        const effects = [flashUser, triggerMode, wizz, netherPortal];
 
         const selectedEffect =
           effects[Math.floor(Math.random() * effects.length)];
@@ -171,13 +181,23 @@ const Board = () => {
   };
 
   const addItem = ({ getter, setter }) => {
-    // console.log("add food");
     // génération de coordonnées
     const coordinates = generateRandomCoordinates(mode);
-    // console.log(coordinates);
 
-    // console.log(getter, setter);
-    // mise à jour du state
+    //fusion des deux tableaux
+    const array = [...foodArray, ...trapArray];
+
+    //test pour savoir si un item est déjà existant à cet endroit
+    const itemAlreadyExistsHere = array.some(
+      (item) => item.x === coordinates.x && coordinates.y === item.y
+    );
+
+    // si ça existe déjà, rappeler la fonction
+    if (itemAlreadyExistsHere) {
+      addItem({ getter, setter });
+      return;
+    }
+
     setter((oldArray) => [...oldArray, coordinates]);
   };
 
@@ -189,7 +209,7 @@ const Board = () => {
     trapTimer.current += deltaTime * 0.001;
 
     // ici, gestion de l'apparition de la nourriture
-    if (foodTimer.current > 0.5 && foodArray.length < 20) {
+    if (foodTimer.current > 2 && foodArray.length < 20) {
       foodTimer.current = 0;
       addItem({
         getter: foodArray,
@@ -198,7 +218,7 @@ const Board = () => {
     }
 
     // ici, gestion des pièges
-    if (trapTimer.current > 3 && trapArray.length < 5) {
+    if (trapTimer.current > 3 && trapArray.length < 10) {
       trapTimer.current = 0;
       addItem({
         getter: trapArray,
@@ -219,6 +239,10 @@ const Board = () => {
     removeMode("corner");
     removeMode("impossible");
     removeMode("reversed");
+
+    const video = document.getElementById("die-video");
+    video.style.display = "none";
+    video.pause();
 
     //reset game over
     setGameOver(false);
@@ -269,24 +293,28 @@ const Board = () => {
   // };
 
   return (
-    <div id="board" className={s.board}>
-      {/* <div className={s.pause} onClick={() => pauseGame()}>
-        Pause
-      </div> */}
-      <Snake data={snakeData} />
-
-      <span className={s.score}>Score: {score}</span>
-
+    <>
       {gameOver && <GameOver replay={replay} />}
 
-      {foodArray.map((coordinates) => (
-        <Item key={coordinates.id} coordinates={coordinates} type="food" />
-      ))}
+      <div id="board" className={s.board}>
+        {/* <div className={s.pause} onClick={() => pauseGame()}>
+        Pause
+      </div> */}
+        <Snake data={snakeData} />
 
-      {trapArray.map((coordinates) => (
-        <Item key={coordinates.id} coordinates={coordinates} type="trap" />
-      ))}
-    </div>
+        <span className={s.score}>Score: {score}</span>
+
+        <span className={s.death}>Death: {death}</span>
+
+        {foodArray.map((coordinates) => (
+          <Item key={coordinates.id} coordinates={coordinates} type="food" />
+        ))}
+
+        {trapArray.map((coordinates) => (
+          <Item key={coordinates.id} coordinates={coordinates} type="trap" />
+        ))}
+      </div>
+    </>
   );
 };
 
