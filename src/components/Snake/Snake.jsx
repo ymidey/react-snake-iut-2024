@@ -10,9 +10,9 @@ const Snake = ({ data }) => {
     let background = null;
 
     if (data[data.length - 1] === dot) {
-      background = `url('/skin.jpg') 0 0`;
+      background = `url('/skin.png') 0 0`;
     } else {
-      background = `url('/skin.jpg') ${10 * i}px 10px`;
+      background = `url('/skin.png') ${20 * i}px 20px`;
     }
 
     const style = {

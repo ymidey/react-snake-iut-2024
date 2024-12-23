@@ -11,6 +11,7 @@ import {
   reversedControls,
   wizz,
   netherPortal,
+  pikachu,
 } from "../../utils/utils";
 import GameOver from "../GameOver/GameOver";
 import useStore from "../../utils/store";
@@ -22,7 +23,7 @@ const Board = () => {
   const [paused, setPaused] = useState(false);
   const [snakeData, setSnakeData] = useState([
     [0, 0],
-    [10, 0],
+    [20, 0],
   ]);
 
   const [trapArray, setTrapArray] = useState([]);
@@ -31,7 +32,7 @@ const Board = () => {
   const [hasEnteredResults, setHasEnteredResults] = useState(false);
 
   const [gameOver, setGameOver] = useState(false);
-  const [speed, setSpeed] = useState(0.2);
+  const [speed, setSpeed] = useState(0.3);
   const [score, setScore] = useState(0);
   const [death, setDeath] = useState(0);
 
@@ -40,6 +41,11 @@ const Board = () => {
   const trapTimer = useRef(0);
   const direction = useRef("RIGHT");
   const canChangeDirection = useRef(true);
+
+  const [isPaused, setIsPaused] = useState(false);
+  const ambianceMusic = useRef(new Audio("/audio/ambianceMusic.mp3")); // Référence à l'objet Audio
+  ambianceMusic.current.loop = true; // Active la lecture en boucle
+
 
   const gameIsOver = () => {
     gsap.ticker.remove(gameLoop);
@@ -55,8 +61,20 @@ const Board = () => {
     setGameOver(true);
   };
 
+  // Fonction pour jouer la musique
+  const playMusic = () => {
+    ambianceMusic.current.play().catch((err) => {
+      console.error("Impossible de jouer la musique :", err);
+    });
+  };
+
+    // Fonction pour mettre la musique en pause
+  const pauseMusic = () => {
+    ambianceMusic.current.pause();
+  };
+
   const isOutOfBorder = (head) => {
-    if (head[0] >= 500 || head[1] >= 500 || head[0] < 0 || head[1] < 0) {
+    if (head[0] >= 650 || head[1] >= 650 || head[0] < 0 || head[1] < 0) {
       return true;
     } else {
       return false;
@@ -64,27 +82,30 @@ const Board = () => {
   };
 
   const hasEatenItem = ({ getter, setter }) => {
-    const head = snakeData[snakeData.length - 1];
+  const head = snakeData[snakeData.length - 1];
+  const eatSound = new Audio('audio/Food.mp3');
 
-    // comparer les coordonnées de la tête du snake avec LES food
-    const item = getter.find(
-      (_item) => _item.x === head[0] && _item.y === head[1]
-    );
+  // comparer les coordonnées de la tête du snake avec les items
+  const item = getter.find(
+    (_item) => _item.x === head[0] && _item.y === head[1]
+  );
 
-    if (item) {
-      // si y'a match on renvoie true
-
-      // mettre à jour le tableau des food disponibles
-      const newItemArray = getter.filter((_item) => _item !== item);
-
-      setter(newItemArray);
-
-      return true;
-    } else {
-      // sinon on renvoie false
-      return false;
+  if (item) {
+    // Jouer le son uniquement si c'est un foodArray
+    if (getter === foodArray) {
+      eatSound.play();
     }
-  };
+
+    // Mettre à jour le tableau des items disponibles
+    const newItemArray = getter.filter((_item) => _item !== item);
+    setter(newItemArray);
+
+    return true;
+  } else {
+    // Sinon on renvoie false
+    return false;
+  }
+};
 
   const moveSnake = () => {
     let newSnakeData = [...snakeData];
@@ -94,19 +115,19 @@ const Board = () => {
 
     switch (direction.current) {
       case "RIGHT":
-        head = [head[0] + 10, head[1]];
+        head = [head[0] + 20, head[1]];
 
         break;
       case "LEFT":
-        head = [head[0] - 10, head[1]];
+        head = [head[0] - 20, head[1]];
 
         break;
       case "DOWN":
-        head = [head[0], head[1] + 10];
+        head = [head[0], head[1] + 20];
 
         break;
       case "UP":
-        head = [head[0], head[1] - 10];
+        head = [head[0], head[1] - 20];
 
       default:
         break;
@@ -133,7 +154,7 @@ const Board = () => {
     } else {
       if (snakeAteTrap === true) {
         // trap execution logic
-        const effects = [flashUser, triggerMode, wizz, netherPortal];
+        const effects = [flashUser, triggerMode, wizz, netherPortal, pikachu];
 
         const selectedEffect =
           effects[Math.floor(Math.random() * effects.length)];
@@ -144,7 +165,7 @@ const Board = () => {
         // agrandir le serpent
         newSnakeData.unshift([]);
 
-        setScore(score + 10);
+        setScore(score + 1);
 
         if (speed > 0.05) {
           // console.log("speed =", speed);
@@ -157,7 +178,6 @@ const Board = () => {
 
   const hasCollapsed = (head) => {
     let snake = [...snakeData];
-    // let head = snake[snake.length - 1];
 
     // retire la dernière case du tableau
     snake.pop();
@@ -175,6 +195,9 @@ const Board = () => {
   };
 
   const onKeyDown = (e) => {
+     if (e.key === "p") {
+    pauseGame();
+  }
     // console.log(e);
     if (canChangeDirection.current === false) return;
     canChangeDirection.current = false;
@@ -257,7 +280,7 @@ const Board = () => {
     //reset data snake
     setSnakeData([
       [0, 0],
-      [10, 0],
+      [20, 0],
     ]);
     //reset food
     setFoodArray([]);
@@ -283,19 +306,34 @@ const Board = () => {
     };
   }, [snakeData]);
 
-  // const pauseGame = () => {
-  //   console.log("pause game");
-  //   if (paused) {
-  //     gsap.ticker.add(gameLoop);
-  //     setPaused(false);
-  //   } else {
-  //     setPaused(true);
-  //     timer.current = 0;
-  //     foodTimer.current = 0;
+const pauseGame = () => {
+  setPaused((prevPaused) => {
+    if (prevPaused) {
+      gsap.ticker.add(gameLoop);
+      playMusic();
+    } else {
+      gsap.ticker.remove(gameLoop);
+      timer.current = 0;
+      foodTimer.current = 0;
+      trapTimer.current = 0;
+      pauseMusic();
+    }
+    return !prevPaused;
+  });
+};
+// Gestion du chargement initial de la musique
+  useEffect(() => {
+    const handleKeydown = () => {
+      playMusic(); // Joue la musique à la première interaction
+      document.removeEventListener("keydown", handleKeydown); // Retire l'écouteur après la première touche
+    };
 
-  //     gsap.ticker.remove(gameLoop);
-  //   }
-  // };
+    document.addEventListener("keydown", handleKeydown); // Ajoute l'écouteur pour la première interaction
+
+    return () => {
+      document.removeEventListener("keydown", handleKeydown); // Nettoie l'écouteur
+    };
+  }, []); // Exécuté une seule fois au montage
 
   return (
     <>
@@ -309,7 +347,14 @@ const Board = () => {
       )}
       {gameOver && <Scoreboard />}
 
+      <div id="border" className={s.border}>
+      </div>
       <div id="board" className={s.board}>
+         {paused && (
+    <div className={s.pauseOverlay}>
+      <span>Jeu en pause</span>
+    </div>
+  )}
         <Snake data={snakeData} />
 
         <span className={s.score}>Score: {score}</span>
@@ -324,6 +369,7 @@ const Board = () => {
           <Item key={coordinates.id} coordinates={coordinates} type="trap" />
         ))}
       </div>
+      
     </>
   );
 };

@@ -25,15 +25,17 @@ function App() {
 
   return (
     <div>
+      <video autoPlay muted loop id="background-video">
+    <source src="/background.mp4" type="video/mp4" />
+    Your browser does not support the video tag.
+  </video>
       <video src="/you-died.mp4" id="die-video" className="die-video"></video>
-      <video
-        src="/nether.mp4"
-        id="nether-video"
-        className="nether-video"
-        autoPlay
-        loop
-        muted
-      ></video>
+  <img 
+    src="Detective-Pikachu-Dancing-Gree-unscreen.gif" 
+    id="nether-video"
+    className="nether-video" 
+    alt="Detective Pikachu Dancing"
+/>
 
       <div {...getRootProps({ className: "dropzone" })}>
         <input {...getInputProps()} />
@@ -41,6 +43,7 @@ function App() {
       </div>
 
       <div className="flashbang"></div>
+      <div className="pikachu"></div>
       <Board />
       <div className="toggle-wrapper">
         <Toggle mode={"corner"} />

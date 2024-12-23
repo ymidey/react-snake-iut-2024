@@ -5,8 +5,8 @@ import useStore from "./store";
 const flashbangAudio = new Audio("/audio/csgo-flashbang.mp3");
 
 let flashTween = null;
+let pikachuTween = null;
 
-// window.location.href = "https://google.com";
 export const netherPortal = () => {
   const video = document.getElementById("nether-video");
   video.style.display = "block";
@@ -29,6 +29,49 @@ export const flashUser = () => {
     delay: 0.25,
   });
 };
+// Précharge le son dès le début
+const pikachuSound = new Audio('audio/pikachu.mp3');
+pikachuSound.load(); // Assure le préchargement
+
+export const pikachu = () => {
+  console.log("Pikachu !");
+
+  if (pikachuTween) pikachuTween.kill();
+
+  // Rejoue le son immédiatement sans attendre
+  pikachuSound.currentTime = 0;
+  pikachuSound.play();
+
+  const pikachuElement = document.querySelector(".pikachu");
+  pikachuElement.style.opacity = "1";
+
+  pikachuTween = gsap.timeline({
+    onComplete: () => {
+      gsap.to(".pikachu", {
+        opacity: 0,
+        duration: 1,
+        delay: 0.25,
+      });
+    },
+  });
+
+  pikachuTween
+    .to(pikachuElement, {
+      backgroundColor: "yellow",
+      opacity: 1,
+      duration: 0.1,
+      repeat: 2,
+      yoyo: true,
+    })
+    .to(pikachuElement, {
+      backgroundColor: "orange",
+      duration: 0.1,
+      repeat: 2,
+      yoyo: true,
+    });
+};
+
+
 
 export const triggerMode = () => {
   const modes = ["impossible", "corner", "reversed"];
@@ -43,7 +86,7 @@ export const triggerMode = () => {
 };
 
 export const wizz = () => {
-  gsap.to("#board", {
+  gsap.to("#board, #border", {
     duration: 0.05,
     x: "+=30%",
     yoyo: true,
@@ -118,59 +161,37 @@ export const defaultControls = (e, direction) => {
   }
 };
 
-export const generateRandomCoordinates = (mode) => {
-  // console.log("generate random");
+export const generateRandomCoordinates = (mode, boardSize = 650, objectSize = 20) => {
   const id = uniqid();
-  let min = 0;
-  let max = 49;
+  const min = 0;
+  const max = boardSize - objectSize; // Dernière position valide
   let x, y;
 
   if (mode.includes("corner")) {
-    // logique pour générer des coordonnées uniquement sur les côtés
     const side = Math.random();
-    console.log(side);
 
     if (side <= 0.25) {
-      console.log("generate left");
-      //générer à gauche
+      // Générer sur le bord gauche
       x = min;
-      y = Math.floor((Math.random() * (max - min + 1) + min) / 2) * 2;
-      y *= 10;
+      y = Math.floor(Math.random() * (max / objectSize)) * objectSize;
     } else if (side > 0.25 && side <= 0.5) {
-      console.log("generate right");
-      //générer à droite
-      x = max * 10;
-      y = Math.floor((Math.random() * (max - min + 1) + min) / 2) * 2;
-      y *= 10;
+      // Générer sur le bord droit
+      x = max;
+      y = Math.floor(Math.random() * (max / objectSize)) * objectSize;
     } else if (side > 0.5 && side <= 0.75) {
-      console.log("generate bottom");
-      x = Math.floor((Math.random() * (max - min + 1) + min) / 2) * 2;
-      x *= 10;
-
-      y = max * 10;
-      //générer en bas
-    } else if (side > 0.75) {
-      console.log("generate top");
-      x = Math.floor((Math.random() * (max - min + 1) + min) / 2) * 2;
-      x *= 10;
-
+      // Générer sur le bord bas
+      x = Math.floor(Math.random() * (max / objectSize)) * objectSize;
+      y = max;
+    } else {
+      // Générer sur le bord haut
+      x = Math.floor(Math.random() * (max / objectSize)) * objectSize;
       y = min;
-      //générer en haut
     }
-
-    // console.log(side);
   } else {
-    // logique classique
-    x = Math.floor((Math.random() * (max - min + 1) + min) / 2) * 2;
-
-    x *= 10;
-
-    y = Math.floor((Math.random() * (max - min + 1) + min) / 2) * 2;
-
-    y *= 10;
+    // Mode classique
+    x = Math.floor(Math.random() * (max / objectSize)) * objectSize;
+    y = Math.floor(Math.random() * (max / objectSize)) * objectSize;
   }
-
-  // console.log(x, y);
 
   return { x, y, id };
 };

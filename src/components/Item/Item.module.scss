@@ -1,14 +1,13 @@
 .item {
-  width: 10px;
-  height: 10px;
+  width: 20px;
+  height: 20px;
   position: absolute;
-  border: solid 1px white;
 
   &_trap {
-    background-color: blue;
+    background: url('../../../public/bush.png'); // Trap image
   }
 
   &_food {
-    background-color: red;
+    background: url('../../../public/pokeball.png'); // Food image
   }
 }
