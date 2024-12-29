@@ -7,8 +7,8 @@ const flashbangAudio = new Audio("/audio/csgo-flashbang.mp3");
 let flashTween = null;
 let pikachuTween = null;
 
-export const netherPortal = () => {
-  const video = document.getElementById("nether-video");
+export const pikachuDancing = () => {
+  const video = document.getElementById("pikachuDancing-video");
   video.style.display = "block";
 
   setTimeout(() => {

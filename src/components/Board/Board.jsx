@@ -10,7 +10,7 @@ import {
   triggerMode,
   reversedControls,
   wizz,
-  netherPortal,
+  pikachuDancing,
   pikachu,
 } from "../../utils/utils";
 import GameOver from "../GameOver/GameOver";
@@ -91,7 +91,7 @@ const Board = () => {
   );
 
   if (item) {
-    // Jouer le son uniquement si c'est un foodArray
+    // Joue le son uniquement si c'est un foodArray
     if (getter === foodArray) {
       eatSound.play();
     }
@@ -108,6 +108,7 @@ const Board = () => {
 };
 
   const moveSnake = () => {
+      if (paused) return;
     let newSnakeData = [...snakeData];
     let head = newSnakeData[newSnakeData.length - 1];
 
@@ -147,14 +148,13 @@ const Board = () => {
       setter: setTrapArray,
     });
 
-    // console.log(snakeCollapsed);
 
     if (outOfBorder || snakeCollapsed) {
       gameIsOver();
     } else {
       if (snakeAteTrap === true) {
         // trap execution logic
-        const effects = [flashUser, triggerMode, wizz, netherPortal, pikachu];
+        const effects = [flashUser, triggerMode, wizz, pikachuDancing, pikachu];
 
         const selectedEffect =
           effects[Math.floor(Math.random() * effects.length)];
@@ -168,7 +168,6 @@ const Board = () => {
         setScore(score + 1);
 
         if (speed > 0.05) {
-          // console.log("speed =", speed);
           setSpeed(speed - 0.02);
         }
       }
@@ -197,6 +196,7 @@ const Board = () => {
   const onKeyDown = (e) => {
      if (e.key === "p") {
     pauseGame();
+    return;
   }
     // console.log(e);
     if (canChangeDirection.current === false) return;
@@ -229,14 +229,13 @@ const Board = () => {
   };
 
   const gameLoop = (time, deltaTime, frame) => {
-    // console.log(time, deltaTime, frame);
-    // console.log("game loop");
+    if (paused) return;
     timer.current += deltaTime * 0.001;
     foodTimer.current += deltaTime * 0.001;
     trapTimer.current += deltaTime * 0.001;
 
     // ici, gestion de l'apparition de la nourriture
-    if (foodTimer.current > 2 && foodArray.length < 20) {
+    if (foodTimer.current > 2 && foodArray.length < 5) {
       foodTimer.current = 0;
       addItem({
         getter: foodArray,
@@ -245,7 +244,7 @@ const Board = () => {
     }
 
     // ici, gestion des pièges
-    if (trapTimer.current > 3 && trapArray.length < 10) {
+    if (trapTimer.current > 3 && trapArray.length < 3) {
       trapTimer.current = 0;
       addItem({
         getter: trapArray,

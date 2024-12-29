@@ -32,8 +32,8 @@ function App() {
       <video src="/you-died.mp4" id="die-video" className="die-video"></video>
   <img 
     src="Detective-Pikachu-Dancing-Gree-unscreen.gif" 
-    id="nether-video"
-    className="nether-video" 
+    id="pikachuDancing-video"
+    className="pikachuDancing-video" 
     alt="Detective Pikachu Dancing"
 />
 
